@@ -788,7 +788,7 @@ class Engine {
         const y = npc.y;
         
         // Si el NPC tiene sprite cargado, usarlo
-        if (npc.spriteLoaded && npc.sprite && npc.sprite.complete) {
+        if (npc.spriteLoaded && npc.sprite && npc.sprite.complete && npc.sprite.naturalWidth > 0) {
             const frameWidth = 32;
             const frameHeight = 32;
             
@@ -815,11 +815,22 @@ class Engine {
                 32, 32
             );
         } else {
-            // Fallback: dibujar círculo simple mientras carga
+            // Fallback: dibujar círculo de color mientras carga el sprite
             ctx.fillStyle = npc.color;
             ctx.beginPath();
             ctx.arc(x, y, 12, 0, Math.PI * 2);
             ctx.fill();
+            
+            // Borde para distinguirlo
+            ctx.strokeStyle = 'white';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Indicador de carga
+            ctx.fillStyle = 'white';
+            ctx.font = '10px monospace';
+            ctx.textAlign = 'center';
+            ctx.fillText('...', x, y - 18);
         }
         
         // Sombra
