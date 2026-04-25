@@ -46,12 +46,20 @@ class Engine {
     fitWorldToView() {
         if (!this.world) return;
         
-        const w = this.worldPixelWidth || (this.world.width * CONFIG.TILE_SIZE);
-        const h = this.worldPixelHeight || (this.world.height * CONFIG.TILE_SIZE);
+        const w = this.worldPixelWidth || NAV.MAP_WIDTH;
+        const h = this.worldPixelHeight || NAV.MAP_HEIGHT;
+        
+        // Detectar si es móvil
+        const isMobile = window.innerWidth <= 768;
         
         const zoomX = (this.canvas.width * 0.95) / w;
         const zoomY = (this.canvas.height * 0.95) / h;
-        const zoom = Math.min(zoomX, zoomY);
+        let zoom = Math.min(zoomX, zoomY);
+        
+        // En móvil, hacer zoom un poco más para que se vea mejor
+        if (isMobile) {
+            zoom = zoom * 1.2; // Acercar un 20% en móvil
+        }
         
         this.camera = {
             x: (this.canvas.width - w * zoom) / 2,
