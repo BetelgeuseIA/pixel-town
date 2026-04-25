@@ -1,7 +1,45 @@
-// main.js - Punto de entrada con navegación inteligente
+// main.js - Punto de entrada con navegación inteligente y sonido
 
 // Inicializar sistema de navegación
 const navGrid = new NavGrid();
+
+// Sistema de audio
+const audioSystem = {
+    bgMusic: new Audio('assets/background.mp3'),
+    initialized: false,
+    
+    init() {
+        this.bgMusic.loop = true;
+        this.bgMusic.volume = 0.3;
+        this.initialized = true;
+    },
+    
+    play() {
+        if (this.initialized) {
+            this.bgMusic.play().catch(e => console.log('Audio autoplay blocked:', e));
+        }
+    },
+    
+    pause() {
+        this.bgMusic.pause();
+    },
+    
+    toggle() {
+        if (this.bgMusic.paused) {
+            this.play();
+        } else {
+            this.pause();
+        }
+    }
+};
+
+// Inicializar audio después de primera interacción del usuario
+document.addEventListener('click', () => {
+    if (!audioSystem.initialized) {
+        audioSystem.init();
+        audioSystem.play();
+    }
+}, { once: true });
 
 // Ajustes para móvil
 function isMobile() {
@@ -167,6 +205,21 @@ document.getElementById('btn-speed').addEventListener('click', () => {
     const speed = engine.cycleSpeed();
     const label = speed === 0.5 ? '½x' : speed === 1 ? 'x1' : speed === 2 ? 'x2' : 'x4';
     document.getElementById('btn-speed').textContent = `⚡ ${label}`;
+});
+
+// Botón de música
+const btnMusic = document.getElementById('btn-music');
+btnMusic.addEventListener('click', () => {
+    if (!audioSystem.initialized) {
+        audioSystem.init();
+        audioSystem.play();
+        btnMusic.textContent = '🔊 Música';
+        btnMusic.style.borderColor = '#27ae60';
+    } else {
+        audioSystem.toggle();
+        btnMusic.textContent = audioSystem.bgMusic.paused ? '🔇 Música' : '🔊 Música';
+        btnMusic.style.borderColor = audioSystem.bgMusic.paused ? '#c0392b' : '#27ae60';
+    }
 });
 
 document.getElementById('btn-interact').addEventListener('click', () => {
