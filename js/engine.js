@@ -495,7 +495,34 @@ class Engine {
             ctx.drawImage(this.mapImage, 0, 0);
         }
         
-        // Dibujar NPCs con sprites reales
+        // DEBUG: Mostrar información de cámara y NPCs
+        if (this.npcs && this.npcs.length > 0) {
+            let visibleCount = 0;
+            for (const npc of this.npcs) {
+                const screenX = npc.x * this.camera.zoom + this.camera.x;
+                const screenY = npc.y * this.camera.zoom + this.camera.y;
+                const isVisible = screenX >= -50 && screenX <= w + 50 && 
+                                 screenY >= -50 && screenY <= h + 50;
+                if (isVisible) visibleCount++;
+            }
+            
+            // Solo loggear cada 60 frames (1 segundo a 60fps)
+            if (!this._frameCount) this._frameCount = 0;
+            this._frameCount++;
+            if (this._frameCount % 60 === 0) {
+                console.log(`📊 Cámara: zoom=${this.camera.zoom.toFixed(2)}, ` +
+                           `pos=(${Math.round(this.camera.x)},${Math.round(this.camera.y)}), ` +
+                           `canvas=${w}x${h}`);
+                console.log(`👥 NPCs: ${this.npcs.length} total, ${visibleCount} visibles`);
+                for (let i = 0; i < Math.min(3, this.npcs.length); i++) {
+                    const npc = this.npcs[i];
+                    console.log(`  NPC ${i}: (${Math.round(npc.x)},${Math.round(npc.y)}) ` +
+                               `sprite=${npc.spriteLoaded}, state=${npc.state}`);
+                }
+            }
+        }
+        
+        // Dibujar NPCs
         for (const npc of this.npcs) {
             this.renderNPC(ctx, npc);
         }
