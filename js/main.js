@@ -1,58 +1,15 @@
 // main.js - Punto de entrada con navegación inteligente y sonido
 
-// Inicializar sistema de navegación
+// Inicializar sistema de navegación PRIMERO
 const navGrid = new NavGrid();
 
-// ACTIVAR ZONAS DE OBSTÁCULOS (colisiones)
+// ACTIVAR ZONAS DE OBSTÁCULOS (colisiones) - ANTES de crear NPCs
 if (window.NAV && window.NAV.ZONES) {
     navGrid.updateZones(window.NAV.ZONES);
     console.log('🚧 Colisiones activadas - NPCs respetarán casas y agua');
 }
 
-// Sistema de audio
-const audioSystem = {
-    bgMusic: new Audio('assets/background.mp3'),
-    initialized: false,
-    
-    init() {
-        this.bgMusic.loop = true;
-        this.bgMusic.volume = 0.3;
-        this.initialized = true;
-    },
-    
-    play() {
-        if (this.initialized) {
-            this.bgMusic.play().catch(e => console.log('Audio autoplay blocked:', e));
-        }
-    },
-    
-    pause() {
-        this.bgMusic.pause();
-    },
-    
-    toggle() {
-        if (this.bgMusic.paused) {
-            this.play();
-        } else {
-            this.pause();
-        }
-    }
-};
-
-// Inicializar audio después de primera interacción del usuario
-document.addEventListener('click', () => {
-    if (!audioSystem.initialized) {
-        audioSystem.init();
-        audioSystem.play();
-    }
-}, { once: true });
-
-// Ajustes para móvil
-function isMobile() {
-    return window.innerWidth <= 768 || 'ontouchstart' in window;
-}
-
-// Inicializar
+// Inicializar mundo
 const world = new World(CONFIG.MAP_WIDTH, CONFIG.MAP_HEIGHT);
 
 // Asignar casas a NPCs
