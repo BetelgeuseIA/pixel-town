@@ -3,20 +3,25 @@
 // Inicializar sistema de navegación
 const navGrid = new NavGrid();
 
-// Inicializar mundo
+// Ajustes para móvil
+function isMobile() {
+    return window.innerWidth <= 768 || 'ontouchstart' in window;
+}
+
+// Inicializar
 const world = new World(CONFIG.MAP_WIDTH, CONFIG.MAP_HEIGHT);
 
 // Asignar casas a NPCs
 const houses = NAV.ZONES.houses;
 
-// Crear NPCs - spawnear cerca de sus casas
+// Crear NPCs - asegurar que spawneen dentro del mapa visible
 world.npcs = [];
 for (let i = 0; i < CONFIG.NPC_COUNT; i++) {
     const house = houses[i % houses.length];
     
-    // Spawnear cerca de la puerta de la casa
-    const spawnX = house.door.x + Utils.randomBetween(-20, 20);
-    const spawnY = house.door.y + Utils.randomBetween(-20, 20);
+    // Spawnear cerca de la puerta de la casa (dentro del mapa)
+    const spawnX = Math.min(Math.max(house.door.x + Utils.randomBetween(-20, 20), 50), NAV.MAP_WIDTH - 50);
+    const spawnY = Math.min(Math.max(house.door.y + Utils.randomBetween(-20, 20), 50), NAV.MAP_HEIGHT - 50);
     
     const npc = new NPC(i, spawnX, spawnY, world);
     
