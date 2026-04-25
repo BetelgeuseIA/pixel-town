@@ -262,8 +262,52 @@ class NavGrid {
         return null;
     }
     
-    heuristic(a, b) {
-        return Math.abs(a.col - b.col) + Math.abs(a.row - b.row);
+    // NUEVO: Actualizar walkability basado en zonas del mapa
+    updateZones(zones) {
+        if (!zones) return;
+        
+        // Marcar agua como no caminable
+        for (const zone of zones.water || []) {
+            this.markZone(zone.x, zone.y, zone.w, zone.h, false);
+        }
+        for (const zone of zones.lake || []) {
+            this.markZone(zone.x, zone.y, zone.w, zone.h, false);
+        }
+        for (const zone of zones.pond || []) {
+            this.markZone(zone.x, zone.y, zone.w, zone.h, false);
+        }
+        
+        // Marcar casas como no caminable (excepto puertas)
+        for (const house of zones.houses || []) {
+            this.markZone(house.x, house.y, house.w, house.h, false);
+            // La puerta sí es caminable
+            const doorNode = this.worldToGrid(house.door.x, house.door.y);
+            if (this.inBounds(doorNode.col, doorNode.row)) {
+                this.grid[doorNode.row][doorNode.col].walkable = true;
+                this.grid[doorNode.row][doorNode.col].cost = 1;
+            }
+        }
+        
+        // Los caminos ya son caminables por defecto
+        console.log('🚧 Zonas de obstáculos aplicadas al pathfinding');
+    }
+    
+    markZone(x, y, w, h, walkable) {
+        const start = this.worldToGrid(x, y);
+        const end = this.worldToGrid(x + w, y + h);
+        
+        for (let row = start.row; row <= end.row; row++) {
+            for (let col = start.col; col <= end.col; col++) {
+                if (this.inBounds(col, row)) {
+                    this.grid[row][col].walkable = walkable;
+                    this.grid[row][col].cost = walkable ? 1 : Infinity;
+                }
+            }
+        }
+    }
+    
+    inBounds(col, row) {
+        return row >= 0 && row < this.rows && col >= 0 && col < this.cols;
     }
     
     reconstructPath(cameFrom, current) {
