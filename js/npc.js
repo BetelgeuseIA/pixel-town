@@ -81,7 +81,7 @@ class NPC {
     loadSprite() {
         // Intentar cargar el sprite, pero no bloquear si falla
         this.sprite = new Image();
-        this.sprite.crossOrigin = 'anonymous'; // Para CORS
+        // CORS eliminado para GitHub Pages
         this.sprite.onload = () => {
             this.spriteLoaded = true;
             console.log(`✅ Sprite cargado para NPC ${this.id} (${this.sprite.naturalWidth}x${this.sprite.naturalHeight})`);
@@ -91,7 +91,7 @@ class NPC {
             this.spriteLoaded = false;
         };
         this.sprite.src = 'assets/32x32folk.png';
-        console.log(`🔄 Cargando sprite para NPC ${this.id}...`);
+        // Carga simple sin logs
     }
     
     generateName() {
