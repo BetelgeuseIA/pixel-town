@@ -1,8 +1,8 @@
 const CONFIG = {
     // Canvas
     TILE_SIZE: 32,
-    MAP_WIDTH: 40,
-    MAP_HEIGHT: 30,
+    MAP_WIDTH: 88,   // 2816/32 = 88 tiles para coincidir con el mapa real
+    MAP_HEIGHT: 48,  // 1536/32 = 48 tiles para coincidir con el mapa real
     
     // Sistema de tiempo real
     DAY_DURATION_MS: 10 * 60 * 1000,      // 10 minutos de día
