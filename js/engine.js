@@ -523,18 +523,22 @@ class Engine {
         }
         
         // Dibujar NPCs con frustum culling
-        const margin = 50; // Margen para NPCs parcialmente visibles
+        const margin = 50;
         const viewLeft = -this.camera.x / this.camera.zoom - margin;
         const viewTop = -this.camera.y / this.camera.zoom - margin;
         const viewRight = viewLeft + (w / this.camera.zoom) + margin * 2;
         const viewBottom = viewTop + (h / this.camera.zoom) + margin * 2;
         
         for (const npc of this.npcs) {
-            // Frustum culling: solo renderizar NPCs visibles
             if (npc.x >= viewLeft && npc.x <= viewRight && 
                 npc.y >= viewTop && npc.y <= viewBottom) {
                 this.renderNPC(ctx, npc);
             }
+        }
+        
+        // DEBUG: Mostrar zonas no caminables (opcional, para desarrollo)
+        if (this.debugNav && window.NAV) {
+            this.renderObstacles(ctx);
         }
         
         ctx.restore();
@@ -914,6 +918,37 @@ class Engine {
         const g = Math.floor(parseInt(hex.substr(2, 2), 16) * factor);
         const b = Math.floor(parseInt(hex.substr(4, 2), 16) * factor);
         return `rgb(${r},${g},${b})`;
+    }
+    
+    renderObstacles(ctx) {
+        if (!window.NAV || !window.NAV.ZONES) return;
+        
+        // Dibujar zonas de agua (semi-transparente rojo)
+        ctx.fillStyle = 'rgba(255, 0, 0, 0.2)';
+        for (const zone of window.NAV.ZONES.water || []) {
+            ctx.fillRect(zone.x, zone.y, zone.w, zone.h);
+        }
+        for (const zone of window.NAV.ZONES.lake || []) {
+            ctx.fillRect(zone.x, zone.y, zone.w, zone.h);
+        }
+        
+        // Dibujar casas (semi-transparente amarillo)
+        ctx.fillStyle = 'rgba(255, 255, 0, 0.3)';
+        for (const house of window.NAV.ZONES.houses || []) {
+            ctx.fillRect(house.x, house.y, house.w, house.h);
+            // Puerta
+            ctx.fillStyle = 'rgba(0, 255, 0, 0.5)';
+            ctx.beginPath();
+            ctx.arc(house.door.x, house.door.y, 5, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.fillStyle = 'rgba(255, 255, 0, 0.3)';
+        }
+        
+        // Dibujar caminos (semi-transparente verde)
+        ctx.fillStyle = 'rgba(0, 255, 0, 0.2)';
+        for (const road of window.NAV.ZONES.roads || []) {
+            ctx.fillRect(road.x, road.y, road.w, road.h);
+        }
     }
     
     renderTimeOverlay(ctx) {
