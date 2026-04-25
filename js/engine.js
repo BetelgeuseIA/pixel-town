@@ -828,8 +828,23 @@ class Engine {
         const x = npc.x;
         const y = npc.y;
         
+        // Verificar sprite de forma más permisiva
+        let spriteReady = false;
+        if (npc.sprite) {
+            if (npc.sprite.complete && npc.sprite.naturalWidth > 0) {
+                spriteReady = true;
+                npc.spriteLoaded = true; // Actualizar estado
+            } else if (!npc.spriteLoaded && !npc.spriteFailed) {
+                // Intentar verificar si cargó
+                if (npc.sprite.complete) {
+                    npc.spriteLoaded = npc.sprite.naturalWidth > 0;
+                    npc.spriteFailed = !npc.spriteLoaded;
+                }
+            }
+        }
+        
         // Si el NPC tiene sprite cargado, usarlo
-        if (npc.spriteLoaded && npc.sprite && npc.sprite.complete && npc.sprite.naturalWidth > 0) {
+        if (spriteReady) {
             const frameWidth = 32;
             const frameHeight = 32;
             
