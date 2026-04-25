@@ -64,22 +64,11 @@ class NPC {
         this.job = null;
         this.home = null;
         
-        // Sprite - usar sprite global compartido
-        if (!NPC.sharedSprite) {
-            NPC.sharedSprite = new Image();
-            NPC.sharedSprite.src = 'assets/32x32folk.png';
-            NPC.sharedSpriteLoaded = false;
-            NPC.sharedSprite.onload = () => {
-                NPC.sharedSpriteLoaded = true;
-                console.log('✅ Sprite compartido cargado');
-            };
-            NPC.sharedSprite.onerror = () => {
-                console.error('❌ Error cargando sprite');
-            };
-        }
-        this.sprite = NPC.sharedSprite;
+        // Sprite - cargar de forma segura
+        this.spriteLoaded = false;
         this.spriteRow = this.id % 8; // Diferente personaje para cada NPC
         this.spriteFrame = 0;
+        this.loadSprite();
         
         // Animación
         this.animationFrame = 0;
@@ -87,6 +76,20 @@ class NPC {
         
         // Estado de movimiento
         this.isMoving = false;
+    }
+    
+    loadSprite() {
+        // Intentar cargar el sprite, pero no bloquear si falla
+        this.sprite = new Image();
+        this.sprite.onload = () => {
+            this.spriteLoaded = true;
+            console.log(`✅ Sprite cargado para NPC ${this.id}`);
+        };
+        this.sprite.onerror = () => {
+            console.warn(`⚠️ No se pudo cargar sprite para NPC ${this.id}, usando fallback`);
+            this.spriteLoaded = false;
+        };
+        this.sprite.src = 'assets/32x32folk.png';
     }
     
     generateName() {
