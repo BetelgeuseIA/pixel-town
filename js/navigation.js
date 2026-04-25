@@ -289,6 +289,17 @@ class NavGrid {
         }
         
         // Los caminos ya son caminables por defecto
+        
+        // INVALIDAR TODOS LOS PATHS EXISTENTES para forzar recálculo
+        if (window.world && window.world.npcs) {
+            for (const npc of window.world.npcs) {
+                npc.path = null;
+                npc.pathIndex = 0;
+                npc.target = null;
+            }
+            console.log('🔄 Paths invalidados - NPCs recalcularán rutas');
+        }
+        
         console.log('🚧 Zonas de obstáculos aplicadas al pathfinding');
     }
     
