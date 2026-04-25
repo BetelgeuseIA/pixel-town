@@ -64,13 +64,20 @@ class NPC {
         this.job = null;
         this.home = null;
         
-        // Sprite
-        this.sprite = new Image();
-        this.sprite.src = 'assets/32x32folk.png';
-        this.spriteLoaded = false;
-        this.sprite.onload = () => {
-            this.spriteLoaded = true;
-        };
+        // Sprite - usar sprite global compartido
+        if (!NPC.sharedSprite) {
+            NPC.sharedSprite = new Image();
+            NPC.sharedSprite.src = 'assets/32x32folk.png';
+            NPC.sharedSpriteLoaded = false;
+            NPC.sharedSprite.onload = () => {
+                NPC.sharedSpriteLoaded = true;
+                console.log('✅ Sprite compartido cargado');
+            };
+            NPC.sharedSprite.onerror = () => {
+                console.error('❌ Error cargando sprite');
+            };
+        }
+        this.sprite = NPC.sharedSprite;
         this.spriteRow = this.id % 8; // Diferente personaje para cada NPC
         this.spriteFrame = 0;
         

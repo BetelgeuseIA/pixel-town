@@ -815,7 +815,7 @@ class Engine {
         const y = npc.y;
         
         // Si el NPC tiene sprite cargado, usarlo
-        if (npc.spriteLoaded && npc.sprite && npc.sprite.complete && npc.sprite.naturalWidth > 0) {
+        if (NPC.sharedSpriteLoaded && npc.sprite && npc.sprite.complete && npc.sprite.naturalWidth > 0) {
             const frameWidth = 32;
             const frameHeight = 32;
             
