@@ -64,6 +64,16 @@ class NPC {
         this.job = null;
         this.home = null;
         
+        // Sprite
+        this.sprite = new Image();
+        this.sprite.src = 'assets/32x32folk.png';
+        this.spriteLoaded = false;
+        this.sprite.onload = () => {
+            this.spriteLoaded = true;
+        };
+        this.spriteRow = this.id % 8; // Diferente personaje para cada NPC
+        this.spriteFrame = 0;
+        
         // Animación
         this.animationFrame = 0;
         this.idleTime = 0;
