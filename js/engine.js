@@ -49,16 +49,15 @@ class Engine {
         const w = this.worldPixelWidth || NAV.MAP_WIDTH;
         const h = this.worldPixelHeight || NAV.MAP_HEIGHT;
         
-        // Detectar si es móvil
         const isMobile = window.innerWidth <= 768;
         
         const zoomX = (this.canvas.width * 0.95) / w;
         const zoomY = (this.canvas.height * 0.95) / h;
         let zoom = Math.min(zoomX, zoomY);
         
-        // En móvil, hacer zoom un poco más para que se vea mejor
+        // En móvil, mostrar más área para ver NPCs
         if (isMobile) {
-            zoom = zoom * 1.2; // Acercar un 20% en móvil
+            zoom = zoom * 0.8;
         }
         
         this.camera = {
@@ -496,28 +495,14 @@ class Engine {
             ctx.drawImage(this.mapImage, 0, 0);
         }
         
-        // DEBUG: Dibujar posición de NPCs para verificar
+        // Dibujar NPCs con sprites reales
         for (const npc of this.npcs) {
-            // Dibujar un punto rojo grande donde debería estar el NPC
-            ctx.fillStyle = 'red';
-            ctx.beginPath();
-            ctx.arc(npc.x, npc.y, 10, 0, Math.PI * 2);
-            ctx.fill();
-            
-            // Dibujar nombre
-            ctx.fillStyle = 'white';
-            ctx.font = '12px Arial';
-            ctx.fillText(npc.name, npc.x + 15, npc.y);
+            this.renderNPC(ctx, npc);
         }
         
         ctx.restore();
         this.renderTimeOverlay(ctx);
         this.renderMiniMap(ctx);
-        
-        // Log de debug
-        if (this.npcs.length > 0) {
-            console.log(`NPCs: ${this.npcs.length}, Primero: (${Math.round(this.npcs[0].x)}, ${Math.round(this.npcs[0].y)})`);
-        }
     }
     
     renderPath(ctx, path) {
@@ -801,94 +786,63 @@ class Engine {
     renderNPC(ctx, npc) {
         const x = npc.x;
         const y = npc.y;
-        const walkCycle = npc.isMoving ? Math.sin(npc.animationFrame * 0.2) * 2 : 0;
+        
+        // Si el NPC tiene sprite cargado, usarlo
+        if (npc.spriteLoaded && npc.sprite && npc.sprite.complete) {
+            const frameWidth = 32;
+            const frameHeight = 32;
+            
+            // Calcular dirección (0=down, 1=left, 2=right, 3=up)
+            let direction = 0;
+            if (Math.abs(npc.direction.x) > Math.abs(npc.direction.y)) {
+                direction = npc.direction.x > 0 ? 2 : 1; // right : left
+            } else {
+                direction = npc.direction.y > 0 ? 0 : 3; // down : up
+            }
+            
+            // Frame de animación (0, 1, 2) para caminar
+            const frame = npc.isMoving ? Math.floor(npc.animationFrame / 8) % 3 : 1;
+            
+            // Dibujar sprite
+            const spriteX = frame * frameWidth;
+            const spriteY = (npc.spriteRow * 4 + direction) * frameHeight;
+            
+            ctx.drawImage(
+                npc.sprite,
+                spriteX, spriteY,
+                frameWidth, frameHeight,
+                x - 16, y - 16,
+                32, 32
+            );
+        } else {
+            // Fallback: dibujar círculo simple mientras carga
+            ctx.fillStyle = npc.color;
+            ctx.beginPath();
+            ctx.arc(x, y, 12, 0, Math.PI * 2);
+            ctx.fill();
+        }
         
         // Sombra
-        ctx.fillStyle = 'rgba(0,0,0,0.3)';
+        ctx.fillStyle = 'rgba(0,0,0,0.2)';
         ctx.beginPath();
         ctx.ellipse(x, y + 14, 10, 4, 0, 0, Math.PI * 2);
         ctx.fill();
-        
-        // Cuerpo (pixel-art estilo)
-        ctx.fillStyle = npc.color;
-        // Cabeza
-        ctx.fillRect(x - 6, y - 14 + walkCycle * 0.5, 12, 10);
-        // Cuerpo
-        ctx.fillRect(x - 8, y - 4 + walkCycle * 0.3, 16, 12);
-        // Piernas
-        ctx.fillStyle = this.darkenColor(npc.color, 0.7);
-        ctx.fillRect(x - 6, y + 8 - walkCycle, 4, 6);
-        ctx.fillRect(x + 2, y + 8 + walkCycle, 4, 6);
-        
-        // Ojos
-        ctx.fillStyle = 'white';
-        ctx.fillRect(x - 4, y - 10 + walkCycle * 0.5, 3, 3);
-        ctx.fillRect(x + 1, y - 10 + walkCycle * 0.5, 3, 3);
-        ctx.fillStyle = 'black';
-        ctx.fillRect(x - 3, y - 9 + walkCycle * 0.5, 1, 1);
-        ctx.fillRect(x + 2, y - 9 + walkCycle * 0.5, 1, 1);
         
         // Selección
         if (npc === this.selectedNPC) {
             ctx.strokeStyle = '#f1c40f';
             ctx.lineWidth = 2;
-            ctx.strokeRect(x - 12, y - 18, 24, 32);
-            
-            // Flecha indicadora
-            ctx.fillStyle = '#f1c40f';
-            ctx.beginPath();
-            ctx.moveTo(x, y - 22);
-            ctx.lineTo(x - 4, y - 28);
-            ctx.lineTo(x + 4, y - 28);
-            ctx.closePath();
-            ctx.fill();
-        }
-        
-        // Hover
-        if (npc === this.hoverNPC && npc !== this.selectedNPC) {
-            ctx.strokeStyle = 'rgba(255,255,255,0.5)';
-            ctx.lineWidth = 1;
-            ctx.strokeRect(x - 10, y - 16, 20, 28);
+            ctx.strokeRect(x - 18, y - 18, 36, 36);
         }
         
         // Nombre
         ctx.fillStyle = 'white';
-        ctx.font = '10px "Press Start 2P", monospace';
+        ctx.font = '10px monospace';
         ctx.textAlign = 'center';
         ctx.shadowColor = 'black';
         ctx.shadowBlur = 3;
         ctx.fillText(npc.name.split(' ')[0], x, y - 22);
         ctx.shadowBlur = 0;
-        
-        // Estado
-        ctx.fillStyle = 'rgba(255,255,255,0.8)';
-        ctx.font = '8px "Press Start 2P", monospace';
-        ctx.fillText(npc.getStateDescription(), x, y + 22);
-        
-        // Línea al target
-        if (npc.target && npc.isMoving) {
-            ctx.beginPath();
-            ctx.moveTo(x, y + 5);
-            ctx.lineTo(npc.target.x, npc.target.y);
-            ctx.strokeStyle = 'rgba(255,255,255,0.2)';
-            ctx.setLineDash([3, 3]);
-            ctx.lineWidth = 1;
-            ctx.stroke();
-            ctx.setLineDash([]);
-        }
-        
-        // Barra de necesidades
-        const barWidth = 24;
-        const barHeight = 3;
-        const barX = x - barWidth / 2;
-        const barY = y - 32;
-        
-        // Hambre
-        ctx.fillStyle = 'rgba(0,0,0,0.6)';
-        ctx.fillRect(barX, barY, barWidth, barHeight);
-        const hungerPct = npc.needs.hunger / 100;
-        ctx.fillStyle = hungerPct < 0.3 ? '#e74c3c' : '#27ae60';
-        ctx.fillRect(barX, barY, barWidth * hungerPct, barHeight);
     }
     
     darkenColor(color, factor) {
