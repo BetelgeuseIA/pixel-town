@@ -1,0 +1,458 @@
+@import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600;700&display=swap');
+
+:root {
+    --bg-dark: #1a1a2e;
+    --bg-panel: #2d2d4a;
+    --frame-color: #8B4513;
+    --frame-light: #A0522D;
+    --frame-dark: #5D3A1A;
+    --dialogue-bg: #1a0f1a;
+    --dialogue-border: #3d2d3d;
+    --accent: #5d8a66;
+    --text: #e8e8e8;
+    --text-dim: #a0a0b0;
+    --btn-bg: #4a4a6a;
+    --btn-border: #6a6a8a;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+    color: var(--text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    padding: 10px;
+}
+
+/* Contenedor principal del juego - MÁXIMO en desktop */
+#game-wrapper {
+    width: min(1600px, 98vw);
+    height: min(1080px, 98vh);
+    background: var(--bg-panel);
+    border: 4px solid var(--frame-color);
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 
+        0 0 0 2px var(--frame-dark),
+        0 0 0 4px var(--frame-light),
+        0 15px 80px rgba(0, 0, 0, 0.7);
+}
+
+/* Header */
+#game-header {
+    background: linear-gradient(180deg, #2d5a5a 0%, #1a3a3a 100%);
+    padding: 12px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 3px solid var(--frame-dark);
+    flex-shrink: 0;
+}
+
+#game-header h1 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(14px, 1.8vw, 22px);
+    color: #f1c40f;
+    text-shadow: 2px 2px 0 #000;
+    letter-spacing: 1px;
+}
+
+#time-badge {
+    background: rgba(0, 0, 0, 0.5);
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(8px, 1vw, 12px);
+    color: #f1c40f;
+    border: 2px solid #3d7a7a;
+}
+
+/* Área del juego con marco - MÁXIMO */
+#game-screen {
+    position: relative;
+    width: 100%;
+    flex: 1;
+    min-height: 0;
+    background: #1a0a1a;
+    border: 4px solid var(--frame-dark);
+    border-left: 4px solid var(--frame-light);
+    border-right: 4px solid var(--frame-light);
+    overflow: hidden;
+}
+
+#game-canvas {
+    display: block;
+    width: 100%;
+    height: 100%;
+    image-rendering: pixelated;
+    image-rendering: -moz-crisp-edges;
+    image-rendering: crisp-edges;
+    cursor: grab;
+}
+
+#game-canvas:active {
+    cursor: grabbing;
+}
+
+/* Panel de diálogo estilo retro - tamaño proporcional */
+#dialogue-panel {
+    background: var(--dialogue-bg);
+    border: 4px solid var(--frame-color);
+    border-left: 4px solid var(--frame-light);
+    border-right: 4px solid var(--frame-light);
+    border-bottom: none;
+    flex-shrink: 0;
+    height: clamp(160px, 22vh, 260px);
+    display: flex;
+    flex-direction: column;
+}
+
+#dialogue-panel::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--frame-light), transparent);
+}
+
+#dialogue-header {
+    background: linear-gradient(180deg, #3d2d3d 0%, #2d1d2d 100%);
+    padding: 10px 15px;
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(7px, 0.8vw, 10px);
+    color: #a0a0b0;
+    border-bottom: 2px solid var(--dialogue-border);
+    text-transform: uppercase;
+    flex-shrink: 0;
+}
+
+#dialogue-content {
+    padding: 12px 15px;
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: #3d2d3d #1a0f1a;
+    flex: 1;
+}
+
+.dialogue-placeholder {
+    color: #6a5a6a;
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(7px, 0.8vw, 10px);
+    text-align: center;
+    padding: 20px 0;
+    line-height: 1.8;
+}
+
+.dialogue-entry {
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 4px;
+    border-left: 3px solid var(--accent);
+    animation: fadeIn 0.3s ease;
+}
+
+.dialogue-entry .npc-name {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(6px, 0.7vw, 9px);
+    font-weight: normal;
+}
+
+.dialogue-entry .npc-state {
+    font-size: clamp(10px, 1vw, 12px);
+    color: #6a6a8a;
+    margin-left: 8px;
+}
+
+.dialogue-entry .message {
+    font-size: clamp(12px, 1.1vw, 15px);
+    color: var(--text);
+    margin-top: 4px;
+    font-family: 'Inter', sans-serif;
+}
+
+.dialogue-entry .time {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(6px, 0.6vw, 8px);
+    color: #5a5a7a;
+    margin-top: 3px;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; transform: translateY(3px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+/* Controles con estilo pixel - GRANDES */
+#controls {
+    display: flex;
+    gap: 12px;
+    padding: 18px 25px;
+    background: linear-gradient(180deg, #2d2d4a 0%, #1a1a2e 100%);
+    border-top: 3px solid var(--frame-dark);
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.control-btn {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(10px, 1.2vw, 16px);
+    padding: clamp(14px, 1.8vh, 24px) clamp(24px, 3vw, 48px);
+    border: 2px solid var(--btn-border);
+    border-radius: 4px;
+    background: linear-gradient(180deg, var(--btn-bg) 0%, #3a3a5a 100%);
+    color: var(--text);
+    cursor: pointer;
+    transition: all 0.15s;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    box-shadow: 
+        inset 0 1px 0 rgba(255,255,255,0.1),
+        0 2px 4px rgba(0,0,0,0.3);
+    flex: 1;
+    max-width: 280px;
+}
+
+.control-btn:hover {
+    background: linear-gradient(180deg, #5a5a7a 0%, #4a4a6a 100%);
+    transform: translateY(-2px);
+    box-shadow: 
+        inset 0 1px 0 rgba(255,255,255,0.15),
+        0 4px 8px rgba(0,0,0,0.4);
+}
+
+.control-btn:active {
+    transform: translateY(1px);
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.control-btn:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    transform: none;
+}
+
+#btn-pause {
+    border-color: #c0392b;
+}
+
+#btn-interact {
+    border-color: #27ae60;
+}
+
+#btn-help {
+    border-color: #2980b9;
+}
+
+/* Panel de stats del NPC */
+#npc-stats {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 10px;
+    border-radius: 4px;
+    margin-bottom: 8px;
+    border: 1px solid #3d2d3d;
+}
+
+#npc-stats h3 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(7px, 0.8vw, 10px);
+    margin-bottom: 8px;
+}
+
+.stat-bar {
+    margin: 5px 0;
+}
+
+.stat-bar-label {
+    font-size: clamp(9px, 1vw, 12px);
+    color: #8a8aaa;
+    margin-bottom: 2px;
+    display: flex;
+    justify-content: space-between;
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(6px, 0.7vw, 9px);
+}
+
+.stat-bar-track {
+    height: 6px;
+    background: rgba(0, 0, 0, 0.4);
+    border-radius: 3px;
+    overflow: hidden;
+    border: 1px solid #3d3d5a;
+}
+
+.stat-bar-fill {
+    height: 100%;
+    border-radius: 2px;
+    transition: width 0.5s ease;
+}
+
+.stat-hunger { background: #e74c3c; }
+.stat-energy { background: #3498db; }
+.stat-social { background: #9b59b6; }
+
+/* Overlay de ayuda */
+#help-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.85);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    transition: opacity 0.3s;
+}
+
+#help-overlay.hidden {
+    display: none;
+    opacity: 0;
+    pointer-events: none;
+}
+
+#help-content {
+    background: var(--bg-panel);
+    padding: 30px;
+    border-radius: 4px;
+    border: 3px solid var(--frame-color);
+    box-shadow: 
+        0 0 0 2px var(--frame-dark),
+        0 10px 40px rgba(0, 0, 0, 0.6);
+    max-width: 600px;
+    width: 90%;
+    max-height: 80vh;
+    overflow-y: auto;
+}
+
+#help-content h2 {
+    font-family: 'Press Start 2P', monospace;
+    font-size: clamp(10px, 1.2vw, 14px);
+    color: #f1c40f;
+    margin-bottom: 20px;
+    text-align: center;
+    text-shadow: 2px 2px 0 #000;
+}
+
+#help-content ul {
+    list-style: none;
+    margin-bottom: 20px;
+}
+
+#help-content li {
+    padding: 8px 0;
+    font-size: clamp(13px, 1.2vw, 16px);
+    line-height: 1.6;
+    border-bottom: 1px solid #3d3d5a;
+}
+
+#help-content li:last-child {
+    border-bottom: none;
+}
+
+#btn-close-help {
+    width: 100%;
+    margin-top: 15px;
+    max-width: none;
+}
+
+/* Responsive - MÓVIL */
+@media (max-width: 768px) {
+    body {
+        padding: 0;
+    }
+    
+    #game-wrapper {
+        width: 100vw;
+        height: 100vh;
+        border: none;
+        border-radius: 0;
+        box-shadow: none;
+    }
+    
+    #game-header {
+        padding: 8px 12px;
+    }
+    
+    #game-header h1 {
+        font-size: 12px;
+    }
+    
+    #time-badge {
+        font-size: 8px;
+        padding: 6px 10px;
+    }
+    
+    #game-screen {
+        border: 2px solid var(--frame-dark);
+    }
+    
+    #dialogue-panel {
+        height: 130px;
+    }
+    
+    #dialogue-header {
+        font-size: 8px;
+        padding: 8px 12px;
+    }
+    
+    .dialogue-placeholder {
+        font-size: 8px;
+    }
+    
+    #controls {
+        padding: 8px;
+        gap: 6px;
+    }
+    
+    .control-btn {
+        font-size: 7px;
+        padding: 8px 10px;
+        max-width: none;
+        flex: 1;
+    }
+    
+    #help-content {
+        padding: 20px;
+        max-width: 95vw;
+    }
+    
+    #help-content h2 {
+        font-size: 12px;
+    }
+    
+    #help-content li {
+        font-size: 14px;
+    }
+}
+
+/* Pantallas muy grandes */
+@media (min-width: 1600px) {
+    #game-wrapper {
+        width: min(1800px, 95vw);
+        height: min(1150px, 95vh);
+    }
+    
+    #game-header h1 {
+        font-size: 32px;
+    }
+    
+    .control-btn {
+        font-size: 16px;
+        padding: 20px 48px;
+    }
+}

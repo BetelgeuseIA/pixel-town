@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Pixel Town</title>
+    <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+    <div id="game-wrapper">
+        <!-- Header -->
+        <header id="game-header">
+            <h1>PIXEL TOWN</h1>
+            <div id="time-badge">Día 1 - 06:00</div>
+        </header>
+        
+        <!-- Área del juego -->
+        <div id="game-screen">
+            <canvas id="game-canvas"></canvas>
+        </div>
+        
+        <!-- Panel de diálogo -->
+        <div id="dialogue-panel">
+            <div id="dialogue-header">💬 Historial de Conversaciones</div>
+            <div id="dialogue-content">
+                <p class="dialogue-placeholder">Haz click en un habitante para ver su historia...</p>
+            </div>
+        </div>
+        
+        <!-- Botones -->
+        <div id="controls">
+            <button id="btn-pause" class="control-btn">⏸️ Pausa</button>
+            <button id="btn-speed" class="control-btn">⚡ x1</button>
+            <button id="btn-interact" class="control-btn">👋 Interactuar</button>
+            <button id="btn-help" class="control-btn">❓ Ayuda</button>
+        </div>
+    </div>
+
+    <!-- Overlay de ayuda -->
+    <div id="help-overlay" class="hidden">
+        <div id="help-content">
+            <h2>📖 Cómo Jugar</h2>
+            <ul>
+                <li>🖱️ <strong>En PC:</strong> Click para seleccionar, arrastrar para mover cámara, rueda para zoom</li>
+                <li>📱 <strong>En Móvil:</strong> Toca para seleccionar, arrastra con un dedo para mover cámara, pellizca con dos dedos para zoom</li>
+                <li>⏸️ <strong>Pausa</strong> pausa/reanuda la simulación</li>
+                <li>⚡ <strong>x1/x2/x4</strong> cambia la velocidad del tiempo</li>
+                <li>👋 <strong>Interactuar</strong> fuerza acción con NPC seleccionado</li>
+                <li>💤 <strong>Ciclo Día/Noche:</strong> 10 min día, 1 min noche</li>
+                <li>🏠 <strong>Retorno:</strong> Los NPCs vuelven a casa antes de la noche</li>
+                <li>🎉 <strong>Festival:</strong> Evento diario donde se reúnen todos</li>
+            </ul>
+            <button id="btn-close-help" class="control-btn">Cerrar</button>
+        </div>
+    </div>
+
+    <script src="js/utils.js"></script>
+    <script src="js/config.js"></script>
+    <script src="js/navigation.js"></script>
+    <script src="js/world.js"></script>
+    <script src="js/npc.js"></script>
+    <script src="js/engine.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
