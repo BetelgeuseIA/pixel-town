@@ -496,24 +496,28 @@ class Engine {
             ctx.drawImage(this.mapImage, 0, 0);
         }
         
-        // Debug nav grid
-        if (this.debugNav && window.navGrid) {
-            window.navGrid.renderDebug(ctx, { x: 0, y: 0, zoom: 1 });
-        }
-        
-        // Dibujar path del NPC seleccionado
-        if (this.selectedNPC && this.selectedNPC.path) {
-            this.renderPath(ctx, this.selectedNPC.path);
-        }
-        
-        // Dibujar NPCs encima
+        // DEBUG: Dibujar posición de NPCs para verificar
         for (const npc of this.npcs) {
-            this.renderNPC(ctx, npc);
+            // Dibujar un punto rojo grande donde debería estar el NPC
+            ctx.fillStyle = 'red';
+            ctx.beginPath();
+            ctx.arc(npc.x, npc.y, 10, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Dibujar nombre
+            ctx.fillStyle = 'white';
+            ctx.font = '12px Arial';
+            ctx.fillText(npc.name, npc.x + 15, npc.y);
         }
         
         ctx.restore();
         this.renderTimeOverlay(ctx);
         this.renderMiniMap(ctx);
+        
+        // Log de debug
+        if (this.npcs.length > 0) {
+            console.log(`NPCs: ${this.npcs.length}, Primero: (${Math.round(this.npcs[0].x)}, ${Math.round(this.npcs[0].y)})`);
+        }
     }
     
     renderPath(ctx, path) {
