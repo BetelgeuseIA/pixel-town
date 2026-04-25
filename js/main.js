@@ -3,6 +3,12 @@
 // Inicializar sistema de navegación
 const navGrid = new NavGrid();
 
+// ACTIVAR ZONAS DE OBSTÁCULOS (colisiones)
+if (window.NAV && window.NAV.ZONES) {
+    navGrid.updateZones(window.NAV.ZONES);
+    console.log('🚧 Colisiones activadas - NPCs respetarán casas y agua');
+}
+
 // Sistema de audio
 const audioSystem = {
     bgMusic: new Audio('assets/background.mp3'),
