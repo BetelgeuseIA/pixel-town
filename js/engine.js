@@ -522,9 +522,19 @@ class Engine {
             }
         }
         
-        // Dibujar NPCs
+        // Dibujar NPCs con frustum culling
+        const margin = 50; // Margen para NPCs parcialmente visibles
+        const viewLeft = -this.camera.x / this.camera.zoom - margin;
+        const viewTop = -this.camera.y / this.camera.zoom - margin;
+        const viewRight = viewLeft + (w / this.camera.zoom) + margin * 2;
+        const viewBottom = viewTop + (h / this.camera.zoom) + margin * 2;
+        
         for (const npc of this.npcs) {
-            this.renderNPC(ctx, npc);
+            // Frustum culling: solo renderizar NPCs visibles
+            if (npc.x >= viewLeft && npc.x <= viewRight && 
+                npc.y >= viewTop && npc.y <= viewBottom) {
+                this.renderNPC(ctx, npc);
+            }
         }
         
         ctx.restore();
@@ -842,22 +852,36 @@ class Engine {
                 32, 32
             );
         } else {
-            // Fallback: dibujar círculo de color mientras carga el sprite
-            ctx.fillStyle = npc.color;
+            // Fallback visual robusto: personaje simple con color
+            const size = 14;
+            
+            // Sombra
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
             ctx.beginPath();
-            ctx.arc(x, y, 12, 0, Math.PI * 2);
+            ctx.ellipse(x, y + size - 2, size * 0.8, size * 0.3, 0, 0, Math.PI * 2);
             ctx.fill();
             
-            // Borde para distinguirlo
-            ctx.strokeStyle = 'white';
+            // Cuerpo (forma de persona simple)
+            ctx.fillStyle = npc.color;
+            // Cabeza
+            ctx.beginPath();
+            ctx.arc(x, y - size * 0.3, size * 0.5, 0, Math.PI * 2);
+            ctx.fill();
+            // Torso
+            ctx.fillRect(x - size * 0.4, y - size * 0.1, size * 0.8, size * 0.9);
+            
+            // Borde brillante para visibilidad
+            ctx.strokeStyle = 'rgba(255,255,255,0.8)';
             ctx.lineWidth = 2;
             ctx.stroke();
             
-            // Indicador de carga
-            ctx.fillStyle = 'white';
-            ctx.font = '10px monospace';
-            ctx.textAlign = 'center';
-            ctx.fillText('...', x, y - 18);
+            // Indicador de estado
+            if (npc.isMoving) {
+                ctx.fillStyle = '#00ff00';
+                ctx.beginPath();
+                ctx.arc(x + size * 0.6, y - size * 0.6, 3, 0, Math.PI * 2);
+                ctx.fill();
+            }
         }
         
         // Sombra

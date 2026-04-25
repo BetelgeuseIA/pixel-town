@@ -19,8 +19,10 @@ class World {
     }
     
     generate() {
+        // Pre-calcular centro (solo una vez, fuera del loop)
         const centerX = this.width / 2;
         const centerY = this.height / 2;
+        const maxDist = Math.sqrt(centerX ** 2 + centerY ** 2);
         
         // Inicializar tiles con ruido simple
         for (let y = 0; y < this.height; y++) {
@@ -30,10 +32,7 @@ class World {
                 let type = 'grass';
                 
                 // Distribución de zonas
-                const centerX = this.width / 2;
-                const centerY = this.height / 2;
                 const dist = Utils.distance(x, y, centerX, centerY);
-                const maxDist = Math.sqrt(centerX ** 2 + centerY ** 2);
                 const normalized = dist / maxDist;
                 
                 if (normalized < 0.3) {

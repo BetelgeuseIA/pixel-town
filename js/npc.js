@@ -81,15 +81,17 @@ class NPC {
     loadSprite() {
         // Intentar cargar el sprite, pero no bloquear si falla
         this.sprite = new Image();
+        this.sprite.crossOrigin = 'anonymous'; // Para CORS
         this.sprite.onload = () => {
             this.spriteLoaded = true;
-            console.log(`✅ Sprite cargado para NPC ${this.id}`);
+            console.log(`✅ Sprite cargado para NPC ${this.id} (${this.sprite.naturalWidth}x${this.sprite.naturalHeight})`);
         };
-        this.sprite.onerror = () => {
-            console.warn(`⚠️ No se pudo cargar sprite para NPC ${this.id}, usando fallback`);
+        this.sprite.onerror = (e) => {
+            console.warn(`⚠️ Error cargando sprite para NPC ${this.id}:`, e);
             this.spriteLoaded = false;
         };
         this.sprite.src = 'assets/32x32folk.png';
+        console.log(`🔄 Cargando sprite para NPC ${this.id}...`);
     }
     
     generateName() {
